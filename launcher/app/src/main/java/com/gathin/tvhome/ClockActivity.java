@@ -30,23 +30,38 @@ public class ClockActivity extends Activity {
                 | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE);
         scene = new ClockScene(getWindow().getDecorView());
         scene.useHomeWallpaper(this);
+        if (Config.load(this).widgetShelfEnabled) {
+            widgetShelf = new WidgetShelf(this);
+            scene.reserveBottom(Math.round(140 * getResources().getDisplayMetrics().density));
+        }
     }
+
+    private WidgetShelf widgetShelf;
 
     @Override
     protected void onResume() {
         super.onResume();
+        if (widgetShelf != null) widgetShelf.start();
         scene.start();
     }
 
     @Override
     protected void onPause() {
         scene.stop();
+        if (widgetShelf != null) widgetShelf.stop();
         super.onPause();
         finish();   // never left behind in the back stack
     }
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
+        int key=event.getKeyCode();
+        if (key==KeyEvent.KEYCODE_BACK) return super.dispatchKeyEvent(event);
+        if (key==KeyEvent.KEYCODE_DPAD_DOWN && widgetShelf != null && !widgetShelf.hasFocus()) {
+            if (event.getAction()==KeyEvent.ACTION_DOWN) widgetShelf.focusControls();
+            return true;
+        }
+        if (widgetShelf != null && widgetShelf.hasFocus()) return super.dispatchKeyEvent(event);
         // The key that wakes the clock should not also act on Home, so it is consumed here.
         if (event.getAction() == KeyEvent.ACTION_UP) finish();
         return true;

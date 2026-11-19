@@ -233,10 +233,13 @@ final class ClockScene {
     }
 
     /** A random spot that keeps the whole clock on screen, with the glow centred behind it. */
+    private int reservedBottom;
+    void reserveBottom(int pixels) { reservedBottom = pixels; }
+
     private void placeClock() {
         View parent = (View) content.getParent();
         int maxX = Math.max(0, parent.getWidth() - content.getWidth());
-        int maxY = Math.max(0, parent.getHeight() - content.getHeight());
+        int maxY = Math.max(0, parent.getHeight() - reservedBottom - content.getHeight());
         float x = maxX * (0.1f + 0.8f * random.nextFloat());
         float y = maxY * (0.1f + 0.8f * random.nextFloat());
         content.setX(x);

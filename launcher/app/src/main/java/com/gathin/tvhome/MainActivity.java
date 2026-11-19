@@ -480,6 +480,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         animations = cfg.animations;
         advancedEffects = cfg.animations && cfg.advancedEffects;
         reducedMotion = cfg.reducedMotion;
+        if (cfg.widgetShelfEnabled) widgetShelf = new WidgetShelf(this);
         dockRow = cfg.dockRow;
         singleRow = cfg.singleRow;
         focusOvershoot = cfg.focusOvershoot;
@@ -1087,9 +1088,12 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         tileRefresh.onStart();
     }
 
+    private WidgetShelf widgetShelf;
+
     @Override
     protected void onResume() {
         super.onResume();
+        if (widgetShelf != null) widgetShelf.start();
         resumed = true;
         // A festival that started or ended while Home was in the background: rebuild with or without it.
         if (festive != festival.active(LocalDate.now())) {
@@ -1305,6 +1309,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
 
     @Override
     protected void onPause() {
+        if (widgetShelf != null) widgetShelf.stop();
         super.onPause();
         resumed = false;
         // No UP reaches a paused Home, so a vendor-key hold it saw go down would still open its app later.
@@ -1438,6 +1443,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      */
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event.getAction()==KeyEvent.ACTION_DOWN && event.getKeyCode()==KeyEvent.KEYCODE_DPAD_DOWN
+                && focusedTilePosition() >= 0 && focusedTilePosition()+COLUMNS >= adapter.getItemCount()
+                && openPopup==null && !reordering && widgetShelf!=null && widgetShelf.focusControls()) return true;
         // A real key, not onUserInteraction: that also runs when the firmware starts Live TV over Home at power-on.
         if (event.getAction() == KeyEvent.ACTION_DOWN) HomeKeyService.keyOnHome();
         if (homeIgnoreChannelKeys && RemoteKeys.isChannelKey(event.getKeyCode())) return true;
