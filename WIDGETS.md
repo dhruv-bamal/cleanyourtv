@@ -20,3 +20,9 @@ Tested on Xiaomi MIBOX4, Android TV 9 (SDK 28), PI.3933. The widget shelf fits b
 On this test box, the prior clean launcher remains installed. To return to it, run `cmd package set-home-activity com.gathin.tvhome.clean/com.gathin.tvhome.MainActivity` in the authorized TV shell and press Home. To revoke the companion’s test grant, use Android’s Notification access settings or `cmd notification disallow_listener dev.tvwidgets.companion/.Access`.
 
 The showcase candidate is a fork with a companion. An upstream listing would go under Forks → Added features after this source is published in its own repository. Keep the device weather config and unredacted TV screenshots private.
+
+## Screenshots from the Mi Box
+
+![Spotify and weather below the two app rows](docs/widget-preview/home.jpg)
+
+![Spotify and weather below the idle clock](docs/widget-preview/clock.jpg)
